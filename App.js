@@ -11,6 +11,12 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 
 export default function App() {
   const [facing, setFacing] = useState('back');
