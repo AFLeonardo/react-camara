@@ -2,25 +2,24 @@
   "expo": {
     "name": "react-camara",
     "slug": "react-camara",
+    "scheme": "reactcamara",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.leonardorra.reactcamara"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png",
-        "icon": "./assets/icon.png"
+        "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "permissions": [
-        "android.permission.CAMERA"
-      ],
-      "package": "com.leonardorra.reactcamara"
+      "package": "com.leonardorra.reactcamara",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,7 +37,28 @@
           "imageWidth": 200,
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-firebase/app-check",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "dynamic"
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "La app usa la cámara para fotografiar tus apuntes.",
+          "photosPermission": "La app accede a tus fotos para que elijas un apunte de la galería.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-sqlite",
+      "expo-font"
     ]
   }
 }
