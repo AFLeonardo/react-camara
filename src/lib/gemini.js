@@ -22,7 +22,7 @@ Reglas:
 - Cada pregunta tiene exactamente 4 "opciones" y "correcta" es el índice (0 a 3) de la opción correcta.
 - Si la imagen NO es un apunte de estudio, o está tan borrosa que no se puede leer, responde con "titulo": "", "conceptos_clave": [], "preguntas": [] y en "resumen" explica brevemente por qué no se pudo analizar.`;
 
-// Reto extra: estructura forzada con responseSchema.
+// Reto extra
 const RESPONSE_SCHEMA = Schema.object({
   properties: {
     titulo: Schema.string(),
@@ -41,32 +41,46 @@ const RESPONSE_SCHEMA = Schema.object({
 });
 
 let appCheckInstance = null;
+let initPromise = null;
 let model = null;
 
+// Token de depuración fijo, creado en Firebase Console > App Check > Apps >
+// Administrar tokens de depuración. Si existe, se usa el proveedor "debug"
+// (necesario en dev builds y en APKs de prueba que no vienen de Play Store).
+const DEBUG_TOKEN = process.env.EXPO_PUBLIC_APPCHECK_DEBUG_TOKEN;
+const USE_DEBUG = __DEV__ || !!DEBUG_TOKEN;
+
 /**
- * Inicializa App Check una sola vez. En desarrollo usa el proveedor "debug":
- * el token de depuración aparece en logcat y debe registrarse en
- * Firebase Console > App Check > Apps > Administrar tokens de depuración.
- * Si falla, la app sigue funcionando (solo importa cuando App Check se exige).
+ * Inicializa App Check una sola vez. Si falla, la app sigue funcionando
+ * (solo importa cuando App Check se exige).
  */
-export async function initFirebase() {
-  if (appCheckInstance) return;
-  try {
-    const provider = new ReactNativeFirebaseAppCheckProvider();
-    provider.configure({
-      android: { provider: __DEV__ ? 'debug' : 'playIntegrity' },
-      apple: { provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback' },
-    });
-    appCheckInstance = await initializeAppCheck(getApp(), {
-      provider,
-      isTokenAutoRefreshEnabled: true,
-    });
-  } catch (error) {
-    console.warn('No se pudo inicializar App Check:', error);
+export function initFirebase() {
+  if (!initPromise) {
+    initPromise = (async () => {
+      try {
+        const provider = new ReactNativeFirebaseAppCheckProvider();
+        provider.configure({
+          android: USE_DEBUG
+            ? { provider: 'debug', debugToken: DEBUG_TOKEN }
+            : { provider: 'playIntegrity' },
+          apple: USE_DEBUG
+            ? { provider: 'debug', debugToken: DEBUG_TOKEN }
+            : { provider: 'appAttestWithDeviceCheckFallback' },
+        });
+        appCheckInstance = await initializeAppCheck(getApp(), {
+          provider,
+          isTokenAutoRefreshEnabled: true,
+        });
+      } catch (error) {
+        console.warn('No se pudo inicializar App Check:', error);
+      }
+    })();
   }
+  return initPromise;
 }
 
-function getModel() {
+async function getModel() {
+  await initFirebase();
   if (!model) {
     const ai = getAI(getApp(), { appCheck: appCheckInstance ?? undefined });
     model = getGenerativeModel(ai, {
@@ -83,7 +97,7 @@ function getModel() {
 
 /** Envía la imagen (base64) junto con el prompt y regresa el texto crudo de Gemini. */
 export async function analyzeImage(base64, mimeType) {
-  const result = await getModel().generateContent([
+  const result = await (await getModel()).generateContent([
     PROMPT,
     { inlineData: { mimeType, data: base64 } },
   ]);
