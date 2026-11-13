@@ -3,9 +3,16 @@ Es una app pensada para ayudar a los estudiantes a repasar o conocer un resumen 
 
 ## Capturas de pantalla
 
-![Demostración del proyecto](./pics/Pic1.jpg)
-![Demostración del proyecto](./pics/Pic2.jpg)
-![Demostración del proyecto](./pics/Pic3.jpg)
+<p align="center">
+  <img src="./pics/Pic1.jpg" width="30%" alt="Demostración del proyecto 1">
+  <img src="./pics/Pic2.jpg" width="30%" alt="Demostración del proyecto 2">
+  <img src="./pics/Pic3.jpg" width="30%" alt="Demostración del proyecto 3">
+</p>
+
+<p align="center">
+  <img src="./pics/Video.gif" width="60%" alt="Demostración en video">
+</p>
+
 
 # Propmt usado
 ```
